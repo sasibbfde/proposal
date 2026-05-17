@@ -1,0 +1,778 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sasi & Anesha</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;min-height:100vh;overflow-x:hidden;}
+body{font-family:'DM Sans',system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Sinhala","Noto Sans Tamil",sans-serif;background:#02010e;color:#fff;}
+canvas#world{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+canvas#confC{position:fixed;top:0;left:0;width:100%;height:100%;z-index:99;pointer-events:none;}
+.page{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 16px 60px;text-align:center;}
+.screen{display:none;flex-direction:column;align-items:center;gap:14px;max-width:660px;width:100%;animation:rise .9s cubic-bezier(.22,1,.36,1);}
+.screen.active{display:flex;}
+@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+h1{font-family:'Cormorant Garamond',"Noto Serif Sinhala","Noto Serif Tamil",serif;font-size:clamp(1.9rem,5.5vw,3.6rem);font-weight:700;line-height:1.15;color:#fef0d0;}
+h2{font-family:'Cormorant Garamond',"Noto Serif Sinhala","Noto Serif Tamil",serif;font-size:clamp(1.2rem,3.8vw,2.2rem);font-weight:400;font-style:italic;color:#fef0d0;line-height:1.35;}
+.sub{font-size:.95rem;color:rgba(255,225,175,.7);font-weight:300;line-height:1.85;max-width:480px;}
+.divider{width:120px;height:1px;background:linear-gradient(90deg,transparent,#f4a261,#ffd700,#f4a261,transparent);margin:2px auto;}
+.gi{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:rgba(255,215,100,.72);}
+.btn-yes{padding:15px 56px;font-family:'Cormorant Garamond',serif;font-size:1.28rem;font-weight:600;background:linear-gradient(135deg,#b5005b,#e91e8c,#f4a261);color:#fff;border:none;border-radius:60px;cursor:pointer;box-shadow:0 0 40px rgba(233,30,140,.4),0 4px 20px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s;position:relative;z-index:5;}
+.btn-yes:hover{transform:scale(1.07);box-shadow:0 0 60px rgba(233,30,140,.65);}
+.btn-no{padding:10px 26px;font-size:.85rem;background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.16);border-radius:60px;cursor:pointer;position:relative;z-index:10;backdrop-filter:blur(4px);}
+.btn-no:hover{color:rgba(255,255,255,.78);border-color:rgba(255,255,255,.28);}
+.qcard{background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(244,162,97,.07));border:1px solid rgba(255,215,100,.22);border-radius:22px;padding:28px 32px;max-width:530px;width:100%;position:relative;overflow:hidden;}
+.qcard::before{content:'❝';font-family:'Cormorant Garamond',serif;font-size:7rem;color:rgba(244,162,97,.1);position:absolute;top:-14px;left:10px;line-height:1;pointer-events:none;}
+.qtext{font-family:'Cormorant Garamond',serif;font-size:clamp(.98rem,2.3vw,1.2rem);font-style:italic;color:#fef0d0;line-height:1.78;position:relative;z-index:1;}
+.qauthor{font-size:.74rem;color:rgba(255,180,80,.5);margin-top:12px;letter-spacing:2px;text-transform:uppercase;}
+.miss-list{display:flex;flex-direction:column;gap:0;max-width:500px;width:100%;}
+.mr{display:flex;align-items:flex-start;gap:12px;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;}
+.mr:last-child{border:none;}
+.mi{font-size:1.25rem;min-width:24px;line-height:1.4;}
+.mt{font-size:.91rem;color:rgba(255,220,175,.85);line-height:1.5;}
+.mf{font-size:.76rem;color:rgba(255,175,80,.42);font-style:italic;display:block;margin-top:2px;}
+.shimmer{font-family:'Cormorant Garamond',serif;font-size:clamp(1.9rem,7.5vw,4.2rem);font-weight:700;background:linear-gradient(90deg,#ffd700,#ff8fab,#e91e8c,#f4a261,#a78bfa,#ffd700);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shim 4s linear infinite;line-height:1.1;}
+@keyframes shim{0%{background-position:0%}100%{background-position:300%}}
+.love-box{background:linear-gradient(135deg,rgba(230,41,122,.13),rgba(255,215,0,.08),rgba(167,139,250,.1));border:1px solid rgba(255,215,100,.22);border-radius:22px;padding:24px 28px;max-width:500px;width:100%;}
+.love-msg{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:#fef0d0;line-height:1.85;}
+.sasi-b{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.4rem;color:#ffd700;animation:hb 1.6s ease-in-out infinite;}
+@keyframes hb{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.tags{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;}
+.tag{background:rgba(255,255,255,.07);border:1px solid rgba(255,215,100,.2);border-radius:30px;padding:7px 15px;font-size:.78rem;color:#fde8c0;}
+.rf{font-size:3rem;animation:rfx 2.5s ease-in-out infinite;display:inline-block;}
+@keyframes rfx{0%,100%{transform:translateY(0) rotate(-8deg);}50%{transform:translateY(-10px) rotate(8deg);}}
+.nomsg{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.9rem;color:rgba(255,190,90,.5);min-height:20px;}
+.avatar-svg{display:block;max-width:min(420px,92vw);height:auto;filter:drop-shadow(0 20px 55px rgba(0,0,0,.18));animation:floaty 3.6s ease-in-out infinite;}
+.avatar-svg .eye{transform-box:fill-box;transform-origin:center;animation:blink 6.2s infinite;}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}93%,95%{transform:scaleY(.08)}}
+
+.topline{letter-spacing:3px;font-size:.78rem;text-transform:uppercase;font-weight:600;margin-bottom:2px;padding:7px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,90,165,.18);background:rgba(255,255,255,.55);color:rgba(30,22,18,.78);box-shadow:0 10px 28px rgba(0,0,0,.10);}
+body:not(.bright) .topline{background:rgba(0,0,0,.22);border-color:rgba(255,215,100,.18);color:rgba(255,235,200,.78);}
+body.bright .topline{font-size:.86rem;color:rgba(30,22,18,.86);background:rgba(255,255,255,.72);border-color:rgba(30,22,18,.14);}
+.hero-photos{display:none;gap:14px;flex-wrap:wrap;align-items:center;justify-content:center;margin:6px auto 10px;}
+.hero-photos img{width:min(260px,42vw);aspect-ratio:3/4;object-fit:cover;border-radius:22px;border:1px solid rgba(255,215,100,.25);box-shadow:0 18px 60px rgba(0,0,0,.55),0 0 30px rgba(233,30,140,.12);}
+.hero-photos img.wide{width:min(540px,86vw);aspect-ratio:4/3;}
+
+/* Animated avatar bubble */
+.avatar-bubble{display:inline-flex;align-items:center;justify-content:center;width:108px;height:108px;border-radius:999px;position:relative;box-shadow:0 18px 55px rgba(0,0,0,.18),0 0 0 8px rgba(255,255,255,.45);overflow:hidden;transform:translateZ(0);animation:floaty 3.6s ease-in-out infinite;}
+.avatar-bubble img{width:100%;height:100%;object-fit:cover;filter:saturate(1.05) contrast(1.02);}
+.avatar-bubble::after{content:"";position:absolute;inset:-2px;border-radius:999px;background:conic-gradient(from 220deg,#ff2d78,#ffd700,#38bdf8,#a78bfa,#4ade80,#ff2d78);opacity:.55;filter:blur(10px);z-index:0;}
+.avatar-bubble::before{content:"";position:absolute;inset:3px;border-radius:999px;background:rgba(255,255,255,.75);z-index:1;}
+.avatar-bubble img{position:relative;z-index:2;border-radius:999px;}
+.avatar-bubble .ring{position:absolute;right:-4px;bottom:-6px;z-index:3;font-size:26px;filter:drop-shadow(0 8px 10px rgba(0,0,0,.25));}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* Memories carousel */
+.memories{width:100%;max-width:620px;margin-top:10px;}
+.memories .sub{margin:0 auto 2px;}
+.carousel-stage{position:relative;width:min(620px,92vw);height:340px;margin:10px auto 0;perspective:1000px;}
+.carousel-stage{perspective-origin:50% 45%;}
+.carousel{position:absolute;inset:0;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;will-change:transform;animation:spin 28s linear infinite;}
+.carousel-stage:hover .carousel{animation-play-state:paused;}
+@keyframes spin{from{transform:translateZ(-80px) rotateY(0deg)}to{transform:translateZ(-80px) rotateY(360deg)}}
+.memory{position:absolute;top:50%;left:50%;width:190px;height:260px;border-radius:18px;overflow:hidden;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;border:1px solid rgba(255,215,100,.28);box-shadow:0 18px 50px rgba(0,0,0,.55),0 0 22px rgba(255,215,0,.10);background:rgba(255,255,255,.04);backdrop-filter:blur(6px);backface-visibility:hidden;-webkit-backface-visibility:hidden;will-change:transform;}
+.memory img{display:block;width:100%;height:100%;object-fit:cover;background:rgba(255,255,255,.15);filter:saturate(1.05) contrast(1.02);backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:translateZ(0);}
+.memory::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.22),transparent 42%),linear-gradient(180deg,transparent 62%,rgba(2,1,14,.25));pointer-events:none;}
+.memory-caption{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.82rem;color:rgba(255,240,215,.78);margin-top:8px;}
+
+/* Bright theme */
+body.bright{background:radial-gradient(1200px 600px at 20% 0%,rgba(255,236,213,.95),transparent 60%),radial-gradient(900px 520px at 90% 10%,rgba(221,240,255,.9),transparent 55%),linear-gradient(180deg,#fff7f1 0%,#f6fbff 55%,#fff 100%);color:#1b1a23;}
+body.bright canvas#world{display:none;}
+body.bright canvas#confC{z-index:1;opacity:.18;filter:saturate(1.05);}
+body.bright::before,body.bright::after{content:"";position:fixed;inset:-30vmax;z-index:0;pointer-events:none;opacity:.45;mix-blend-mode:normal;}
+body.bright::before{background:
+  radial-gradient(circle at 20% 30%,rgba(255,0,122,.18),transparent 40%),
+  radial-gradient(circle at 75% 20%,rgba(0,200,255,.16),transparent 40%),
+  radial-gradient(circle at 65% 75%,rgba(255,200,0,.14),transparent 42%),
+  radial-gradient(circle at 25% 80%,rgba(124,58,237,.12),transparent 42%);
+  animation:blob 16s ease-in-out infinite alternate;}
+body.bright::after{background:
+  radial-gradient(circle at 35% 25%,rgba(255,120,0,.10),transparent 45%),
+  radial-gradient(circle at 85% 60%,rgba(34,197,94,.10),transparent 45%),
+  radial-gradient(circle at 10% 55%,rgba(236,72,153,.10),transparent 45%);
+  animation:blob 22s ease-in-out infinite alternate-reverse;}
+@keyframes blob{from{transform:translate3d(-2%,0,0) rotate(-2deg) scale(1);}to{transform:translate3d(2%,1%,0) rotate(2deg) scale(1.04);}}
+body.bright .page{color:#1b1a23;}
+body.bright h1,body.bright h2{color:#2a1b12;}
+body.bright .sub{color:rgba(40,28,22,.72);}
+body.bright .gi{color:rgba(120,70,30,.72);}
+body.bright .divider{background:linear-gradient(90deg,transparent,#ff5aa5,#ffb703,#ff5aa5,transparent);}
+body.bright .qcard,body.bright .love-box{background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(255,240,250,.62));border:1px solid rgba(255,90,165,.22);box-shadow:0 18px 60px rgba(0,0,0,.08);}
+body.bright .qtext{color:rgba(25,20,18,.88);}
+body.bright .qauthor{color:rgba(120,70,30,.55);}
+body.bright .love-msg{color:rgba(25,20,18,.88);}
+body.bright .sasi-b{color:#b45309;}
+body.bright .btn-yes{box-shadow:0 14px 40px rgba(233,30,140,.22),0 10px 25px rgba(0,0,0,.10);}
+body.bright .btn-no{background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,245,235,.88));color:rgba(30,22,18,.86);border:1px solid rgba(30,22,18,.22);font-weight:600;}
+body.bright .btn-no:hover{color:rgba(30,22,18,.9);border-color:rgba(30,22,18,.3);}
+body.bright .tag{background:rgba(255,255,255,.7);border:1px solid rgba(255,90,165,.18);color:rgba(40,28,22,.75);}
+body.bright .memory{box-shadow:0 18px 55px rgba(0,0,0,.16),0 0 26px rgba(255,90,165,.10);background:rgba(255,255,255,.65);}
+body.bright .hero-photos img{border:1px solid rgba(255,90,165,.18);box-shadow:0 18px 70px rgba(0,0,0,.14),0 0 36px rgba(255,90,165,.10);}
+body.bright .mt{color:rgba(25,20,18,.86);}
+body.bright .mf{color:rgba(120,70,30,.6);}
+body.bright .nomsg{color:rgba(120,70,30,.85);}
+body.bright .memory-caption{color:rgba(25,20,18,.72);}
+</style>
+
+</head>
+<body>
+
+<canvas id="world"></canvas>
+<canvas id="confC"></canvas>
+<div class="page">
+
+<!-- ===== S1: PROPOSAL ===== -->
+<div class="screen active" id="s1">
+<p class="topline">Sri Lanka · Under the Stars</p>
+
+<!-- Animated avatar (illustration) -->
+<div aria-label="Animated avatar">
+  <span class="rf" aria-hidden="true">💍</span>
+</div>
+
+<!-- (Old avatar art kept but hidden) -->
+<svg class="avatar-svg" width="340" height="280" viewBox="0 0 340 280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Sasi skin gradient - rich warm dark brown -->
+    <radialGradient id="sg" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#c98a63"/>
+      <stop offset="62%" stop-color="#9f5d38"/>
+      <stop offset="100%" stop-color="#7a3f23"/>
+    </radialGradient>
+    <!-- Anesha skin gradient - natural/soft tone -->
+    <radialGradient id="ag" cx="45%" cy="38%" r="55%">
+      <stop offset="0%" stop-color="#f5d0b3"/>
+      <stop offset="58%" stop-color="#e7b08f"/>
+      <stop offset="100%" stop-color="#cc8d68"/>
+    </radialGradient>
+    <!-- Sasi hair gradient -->
+    <radialGradient id="shg" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#2a1208"/>
+      <stop offset="100%" stop-color="#0a0404"/>
+    </radialGradient>
+    <!-- Anesha hair - dark natural tone -->
+    <linearGradient id="ahg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#201008"/>
+      <stop offset="45%" stop-color="#0d0606"/>
+      <stop offset="100%" stop-color="#060303"/>
+    </linearGradient>
+    <!-- Glow backdrop for avatars -->
+    <radialGradient id="glow1" cx="50%" cy="60%" r="50%">
+      <stop offset="0%" stop-color="#ff6b9d" stop-opacity=".25"/>
+      <stop offset="100%" stop-color="#ff6b9d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="50%" cy="60%" r="50%">
+      <stop offset="0%" stop-color="#ffd700" stop-opacity=".2"/>
+      <stop offset="100%" stop-color="#ffd700" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Sasi shirt -->
+    <linearGradient id="shirt1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e8eef8"/>
+    </linearGradient>
+    <!-- Anesha top -->
+    <linearGradient id="top2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#9333ea"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Glow halos -->
+  <ellipse cx="95" cy="200" rx="80" ry="55" fill="url(#glow1)"/>
+  <ellipse cx="245" cy="200" rx="80" ry="55" fill="url(#glow2)"/>
+
+  <!-- ============= SASI ============= -->
+  <!-- BODY/SHIRT - white with subtle detail -->
+  <rect x="42" y="188" width="82" height="80" rx="18" fill="url(#shirt1)" stroke="#dde8f8" stroke-width="1"/>
+  <!-- Tommy Hilfiger stripe hint -->
+  <rect x="52" y="206" width="60" height="5" rx="2" fill="#e8f0ff" opacity=".6"/>
+  <rect x="52" y="213" width="25" height="3" rx="1" fill="#cc0000" opacity=".5"/>
+  <rect x="79" y="213" width="20" height="3" rx="1" fill="#001f7a" opacity=".5"/>
+  <!-- neck -->
+  <path d="M82 175 Q95 178 108 175 L108 192 Q95 196 82 192Z" fill="url(#sg)"/>
+
+  <!-- HEAD - rich, rounded, slightly wider at cheeks -->
+  <ellipse cx="95" cy="148" rx="38" ry="41" fill="url(#sg)"/>
+
+  <!-- highlight on forehead -->
+  <ellipse cx="88" cy="122" rx="16" ry="10" fill="rgba(255,180,100,.18)"/>
+
+  <!-- HAIR - short, textured, deep dark, natural cap shape -->
+  <!-- main hair cap -->
+  <path d="M55 145 Q56 100 95 96 Q134 100 135 145 Q128 118 95 115 Q62 118 55 145Z" fill="url(#shg)"/>
+  <!-- hairline precise edge -->
+  <path d="M56 143 Q58 104 95 101 Q132 104 134 143" fill="url(#shg)" stroke="#0a0404" stroke-width="1"/>
+  <!-- subtle hair texture strokes -->
+  <path d="M62 132 Q70 112 85 108" stroke="#1a0808" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>
+  <path d="M128 132 Q120 112 105 108" stroke="#1a0808" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>
+  <path d="M75 105 Q85 100 95 99 Q105 100 115 105" stroke="#1a0808" stroke-width="2" fill="none" opacity=".5"/>
+
+  <!-- ears with inner detail -->
+  <ellipse cx="55" cy="150" rx="7" ry="10" fill="url(#sg)"/>
+  <ellipse cx="56" cy="150" rx="4" ry="6" fill="#7a3e1a" opacity=".4"/>
+  <ellipse cx="135" cy="150" rx="7" ry="10" fill="url(#sg)"/>
+  <ellipse cx="134" cy="150" rx="4" ry="6" fill="#7a3e1a" opacity=".4"/>
+
+  <!-- BEARD - full, very dark, dense - key feature of Sasi -->
+  <!-- moustache -->
+  <path d="M73 163 Q84 157 95 159 Q106 157 117 163 Q110 169 95 168 Q80 169 73 163Z" fill="#0d0606"/>
+  <!-- beard lower face coverage -->
+  <path d="M60 158 Q57 172 60 186 Q70 198 95 200 Q120 198 130 186 Q133 172 130 158 Q122 168 95 170 Q68 168 60 158Z" fill="#110808"/>
+  <!-- beard texture highlights -->
+  <path d="M65 170 Q72 185 95 189 Q118 185 125 170" stroke="#1e1010" stroke-width="1.5" fill="none" opacity=".6"/>
+  <path d="M68 162 Q75 158 85 160 Q95 158 105 160 Q115 158 122 162" stroke="#1e1010" stroke-width="1" fill="none" opacity=".4"/>
+
+  <!-- EYES - warm dark brown, slightly wide set, expressive -->
+  <!-- eye whites -->
+  <ellipse class="eye" cx="80" cy="146" rx="8.5" ry="7.5" fill="#fff" opacity=".96"/>
+  <ellipse class="eye" cx="110" cy="146" rx="8.5" ry="7.5" fill="#fff" opacity=".96"/>
+  <!-- coloured iris - warm dark chocolate -->
+  <circle cx="81" cy="146.5" r="5.4" fill="#3d1a08"/>
+  <circle cx="111" cy="146.5" r="5.4" fill="#3d1a08"/>
+  <!-- pupil -->
+  <circle cx="81.5" cy="146.5" r="3.2" fill="#0a0202"/>
+  <circle cx="111.5" cy="146.5" r="3.2" fill="#0a0202"/>
+  <!-- VIBRANT eye shine - coloured catchlight -->
+  <circle cx="83.5" cy="143.5" r="2" fill="rgba(255,220,80,.9)"/>
+  <circle cx="113.5" cy="143.5" r="2" fill="rgba(255,220,80,.9)"/>
+  <circle cx="79.5" cy="148" r="1" fill="rgba(255,255,255,.5)"/>
+  <circle cx="109.5" cy="148" r="1" fill="rgba(255,255,255,.5)"/>
+  <!-- Eyebrows - thick, slightly arched dark -->
+  <path d="M69 135 Q80 129 90 132" stroke="#0d0606" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M100 132 Q110 129 121 135" stroke="#0d0606" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <!-- eyelid crease -->
+  <path d="M71 140 Q80 136 89 140" stroke="rgba(100,50,20,.3)" stroke-width="1.5" fill="none"/>
+  <path d="M101 140 Q110 136 119 140" stroke="rgba(100,50,20,.3)" stroke-width="1.5" fill="none"/>
+
+  <!-- nose - broader, defined -->
+  <ellipse cx="95" cy="158" rx="6" ry="4" fill="rgba(80,35,10,.25)"/>
+  <circle cx="89" cy="157" r="3" fill="rgba(70,30,8,.2)"/>
+  <circle cx="101" cy="157" r="3" fill="rgba(70,30,8,.2)"/>
+
+  <!-- big warm smile showing under moustache -->
+  <path d="M79 161 Q95 172 111 161" stroke="#5a2a0a" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+
+  <!-- VIBRANT cheeks - warm coral/peach glow -->
+  <ellipse cx="65" cy="155" rx="11" ry="7" fill="#ff7c3a" opacity=".22"/>
+  <ellipse cx="125" cy="155" rx="11" ry="7" fill="#ff7c3a" opacity=".22"/>
+
+  <!-- arm reaching right -->
+  <path d="M134 210 Q175 196 192 202" stroke="url(#sg)" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <!-- hand -->
+  <ellipse cx="196" cy="203" rx="13" ry="11" fill="#8B4513"/>
+
+  <!-- RING BOX - vibrant deep blue velvet -->
+  <rect x="183" y="186" width="32" height="22" rx="5" fill="#1e1b6e"/>
+  <rect x="183" y="176" width="32" height="14" rx="5" fill="#3730a3"/>
+  <!-- shine on box lid -->
+  <path d="M186 178 Q199 175 212 178" stroke="rgba(255,255,255,.25)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- gold ribbon -->
+  <line x1="199" y1="176" x2="199" y2="208" stroke="#fbbf24" stroke-width="2"/>
+  <line x1="183" y1="192" x2="215" y2="192" stroke="#fbbf24" stroke-width="2"/>
+  <!-- DIAMOND sparkle on top - vibrant -->
+  <polygon points="199,168 202,174 199,180 196,174" fill="#e879f9" stroke="#fff" stroke-width=".8"/>
+  <polygon points="199,170 202,174 199,178 196,174" fill="#c026d3"/>
+  <!-- sparkle rays -->
+  <line x1="199" y1="165" x2="199" y2="168" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="202" y1="168" x2="205" y2="166" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="196" y1="168" x2="193" y2="166" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Sasi name -->
+  <text x="95" y="276" font-family="Cormorant Garamond,serif" font-size="16" fill="#fb923c" font-style="italic" text-anchor="middle" font-weight="600">Sasi</text>
+
+  <!-- ============= ANESHA ============= -->
+  <!-- BODY - vibrant purple top -->
+  <rect x="216" y="188" width="82" height="80" rx="18" fill="url(#top2)" stroke="#a855f7" stroke-width="1.5"/>
+  <!-- neckline detail -->
+  <path d="M228 190 Q258 200 288 190" stroke="#7c3aed" stroke-width="2" fill="none" opacity=".6"/>
+  <!-- GOLD NECKLACE - prominent feature -->
+  <path d="M232 196 Q258 208 284 196" stroke="#fbbf24" stroke-width="2.2" fill="none"/>
+  <circle cx="258" cy="210" r="4" fill="#fbbf24"/>
+  <circle cx="258" cy="210" r="2.5" fill="#fde68a"/>
+  <!-- neck -->
+  <path d="M242 175 Q258 178 274 175 L274 192 Q258 197 242 192Z" fill="url(#ag)"/>
+
+  <!-- HEAD - lighter warm brown, oval, slightly more delicate -->
+  <ellipse cx="258" cy="146" rx="34" ry="39" fill="url(#ag)"/>
+  <!-- highlight -->
+  <ellipse cx="250" cy="120" rx="14" ry="9" fill="rgba(255,200,150,.2)"/>
+
+  <!-- LONG WAVY CURLY HAIR - Anesha's signature - very dark with purple sheen -->
+  <!-- hair crown -->
+  <path d="M222 140 Q224 96 258 92 Q292 96 294 140 Q290 110 258 107 Q226 110 222 140Z" fill="url(#ahg)"/>
+  <path d="M222 138 Q222 102 258 98 Q294 102 294 138" fill="url(#ahg)"/>
+  <!-- left flowing curtain hair -->
+  <path d="M222 140 Q218 165 216 190 Q214 215 215 260" stroke="#0d0412" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <!-- left hair wave texture -->
+  <path d="M218 150 Q224 162 218 174 Q224 186 218 198 Q224 210 218 222" stroke="#1a0828" stroke-width="6" fill="none" stroke-linecap="round" opacity=".7"/>
+  <!-- right side hair -->
+  <path d="M294 140 Q296 162 295 188 Q293 212 290 252" stroke="#0d0412" stroke-width="15" stroke-linecap="round" fill="none" opacity=".75"/>
+  <path d="M294 152 Q289 164 294 176 Q289 188 294 200" stroke="#1a0828" stroke-width="4" fill="none" stroke-linecap="round" opacity=".6"/>
+  <!-- bottom curls -->
+  <path d="M215 240 Q208 250 215 258 Q208 265 216 270" stroke="#0d0412" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M291 238 Q298 250 291 258" stroke="#0d0412" stroke-width="8" fill="none" stroke-linecap="round" opacity=".7"/>
+  <!-- hair parting / crown highlight -->
+  <path d="M240 98 Q258 94 276 98" stroke="#2a1040" stroke-width="3" fill="none" opacity=".5"/>
+
+  <!-- ears -->
+  <ellipse cx="222" cy="148" rx="7" ry="10" fill="url(#ag)"/>
+  <ellipse cx="222" cy="148" rx="4" ry="6" fill="#b07050" opacity=".35"/>
+  <ellipse cx="294" cy="148" rx="7" ry="10" fill="url(#ag)"/>
+  <ellipse cx="294" cy="148" rx="4" ry="6" fill="#b07050" opacity=".35"/>
+  <!-- GOLD STUD EARRINGS - vibrant -->
+  <circle cx="221" cy="148" r="5" fill="#fbbf24" stroke="#fde68a" stroke-width="1"/>
+  <circle cx="221" cy="148" r="2.5" fill="#fef3c7"/>
+  <circle cx="295" cy="148" r="5" fill="#fbbf24" stroke="#fde68a" stroke-width="1"/>
+  <circle cx="295" cy="148" r="2.5" fill="#fef3c7"/>
+
+  <!-- EYES - larger, expressive, with lashes -->
+  <!-- whites -->
+  <ellipse class="eye" cx="244" cy="144" rx="9" ry="8" fill="#fff" opacity=".98"/>
+  <ellipse class="eye" cx="272" cy="144" rx="9" ry="8" fill="#fff" opacity=".98"/>
+  <!-- iris - warm dark -->
+  <circle cx="245" cy="144.5" r="6" fill="#2a1008"/>
+  <circle cx="273" cy="144.5" r="6" fill="#2a1008"/>
+  <!-- pupil -->
+  <circle cx="245.5" cy="144.5" r="3.5" fill="#080202"/>
+  <circle cx="273.5" cy="144.5" r="3.5" fill="#080202"/>
+  <!-- VIBRANT eye shines -->
+  <circle cx="248" cy="141" r="2.2" fill="rgba(255,200,255,.95)"/>
+  <circle cx="276" cy="141" r="2.2" fill="rgba(255,200,255,.95)"/>
+  <circle cx="243" cy="146.5" r="1.2" fill="rgba(255,255,255,.55)"/>
+  <circle cx="271" cy="146.5" r="1.2" fill="rgba(255,255,255,.55)"/>
+  <!-- lashes - top, defined -->
+  <path d="M235 138 Q239 132 244 136 Q249 132 253 138" stroke="#0d0412" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M263 138 Q267 132 272 136 Q277 132 281 138" stroke="#0d0412" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- lower lash hint -->
+  <path d="M236 149 Q244 152 252 149" stroke="#0d0412" stroke-width=".8" fill="none" opacity=".4"/>
+  <path d="M264 149 Q272 152 280 149" stroke="#0d0412" stroke-width=".8" fill="none" opacity=".4"/>
+  <!-- eyebrows - arched, defined -->
+  <path d="M235 132 Q244 126 253 129" stroke="#0d0412" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+  <path d="M263 129 Q272 126 281 132" stroke="#0d0412" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+
+  <!-- nose - smaller, delicate -->
+  <ellipse cx="258" cy="156" rx="5" ry="3.5" fill="rgba(120,60,20,.2)"/>
+  <circle cx="253" cy="155.5" r="2.5" fill="rgba(100,50,18,.18)"/>
+  <circle cx="263" cy="155.5" r="2.5" fill="rgba(100,50,18,.18)"/>
+
+  <!-- BINDI - vibrant fuchsia with glow -->
+  <circle cx="258" cy="125" r="5" fill="#e879f9" opacity=".95"/>
+  <circle cx="258" cy="125" r="3.5" fill="#ec4899"/>
+  <circle cx="258" cy="125" r="2" fill="#fce7f3"/>
+  <!-- bindi glow -->
+  <circle cx="258" cy="125" r="8" fill="rgba(232,121,249,.2)"/>
+
+  <!-- smile - warm, wide -->
+  <path d="M240 161 Q258 174 276 161" stroke="#7a3010" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+  <!-- lip fill hint -->
+  <path d="M244 162 Q258 166 272 162" fill="rgba(200,80,60,.18)"/>
+
+  <!-- VIBRANT cheeks - rose pink glow -->
+  <ellipse cx="230" cy="154" rx="11" ry="7" fill="#f9a8d4" opacity=".28"/>
+  <ellipse cx="286" cy="154" rx="11" ry="7" fill="#f9a8d4" opacity=".28"/>
+
+  <!-- arm reaching left toward Sasi -->
+  <path d="M222 210 Q186 196 170 202" stroke="#c0845a" stroke-width="13" stroke-linecap="round" fill="none"/>
+
+  <!-- Anesha name -->
+  <text x="258" y="276" font-family="Cormorant Garamond,serif" font-size="16" fill="#f0abfc" font-style="italic" text-anchor="middle" font-weight="600">Anesha</text>
+
+  <!-- ===== VIBRANT FLOATING HEARTS & SPARKLES ===== -->
+  <!-- big heart centre -->
+  <text x="210" y="76" font-size="28" fill="#ff2d78" opacity=".95" text-anchor="middle">♥</text>
+  <!-- colour hearts ring -->
+  <text x="188" y="56" font-size="17" fill="#ffd700">♥</text>
+  <text x="232" y="52" font-size="14" fill="#e879f9">♥</text>
+  <text x="172" y="74" font-size="11" fill="#38bdf8">♥</text>
+  <text x="248" y="70" font-size="12" fill="#4ade80">♥</text>
+  <text x="198" y="44" font-size="10" fill="#fb7185">♥</text>
+  <text x="222" y="42" font-size="9" fill="#fbbf24">♥</text>
+  <!-- sparkle stars scattered -->
+  <text x="140" y="105" font-size="14" fill="#ffd700" opacity=".6">✦</text>
+  <text x="268" y="98" font-size="12" fill="#e879f9" opacity=".65">✦</text>
+  <text x="42" y="120" font-size="10" fill="#38bdf8" opacity=".55">✦</text>
+  <text x="296" y="125" font-size="10" fill="#4ade80" opacity=".5">✦</text>
+  <text x="155" y="60" font-size="8" fill="#fb923c" opacity=".6">✦</text>
+  <text x="245" y="58" font-size="8" fill="#a78bfa" opacity=".6">✦</text>
+  <!-- small floating circles -->
+  <circle cx="158" cy="85" r="3" fill="#ff6b9d" opacity=".5"/>
+  <circle cx="262" cy="80" r="3" fill="#7dd3fc" opacity=".45"/>
+  <circle cx="148" cy="70" r="2" fill="#fde68a" opacity=".6"/>
+  <circle cx="272" cy="65" r="2" fill="#bbf7d0" opacity=".5"/>
+</svg>
+
+<h1>Anesha,<br/>will you marry me?</h1>
+<div class="divider"></div>
+<p class="sub">Here in Sri Lanka — where the ocean breathes gold and every star has been leaning in to witness this moment — I want to ask you the question that has lived in my heart longer than words can say.</p>
+<p class="gi">You are my favourite person in every room, every country, every chapter. ✨</p>
+<span class="rf">💍</span>
+<div style="display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap;position:relative;min-height:56px;">
+  <button class="btn-no" id="btnNo" onclick="clickNo()">No…</button>
+  <button class="btn-yes" onclick="goYes()">Yes — a thousand times YES! 💍</button>
+</div>
+<div class="nomsg" id="noMsg"></div>
+</div>
+
+<!-- ===== S2: NO QUOTES ===== -->
+<div class="screen" id="s2">
+<h2 id="s2h">Wait… let me show you what you'd be leaving behind 🥹</h2>
+<div class="divider"></div>
+<div class="qcard">
+  <div class="qtext" id="qtext">…</div>
+  <div class="qauthor" id="qauthor">— Sasi</div>
+</div>
+<div class="miss-list">
+  <div class="mr"><span class="mi">🌅</span><div><span class="mt">Someone who thinks of you before the sun fully rises</span><span class="mf">…before coffee, before anything. Every single morning without fail.</span></div></div>
+  <div class="mr"><span class="mi">🍳</span><div><span class="mt">A man who burns breakfast with total, committed enthusiasm</span><span class="mf">…and somehow it always tastes like love anyway.</span></div></div>
+  <div class="mr"><span class="mi">📸</span><div><span class="mt">Someone who takes 53 photos until you love every single one</span><span class="mf">…because you deserve to see yourself the way I see you.</span></div></div>
+  <div class="mr"><span class="mi">🌍</span><div><span class="mt">A travel partner who gets gloriously, completely lost</span><span class="mf">…and somehow makes it the best part of every trip.</span></div></div>
+  <div class="mr"><span class="mi">🫂</span><div><span class="mt">The world's most stubborn hugger — holds on three extra seconds</span><span class="mf">…because letting go has never been my thing.</span></div></div>
+  <div class="mr"><span class="mi">🌙</span><div><span class="mt">Someone who will love every version of you — the brave and the tired</span><span class="mf">…the shining ones, the quiet ones, the ordinary glorious ones.</span></div></div>
+  <div class="mr"><span class="mi">💛</span><div><span class="mt">A person who chose you before he even knew how to say it</span><span class="mf">…and will keep choosing you every single day, without question.</span></div></div>
+</div>
+<p class="gi" style="margin-top:4px;">The fireflies are rooting for Yes. So is the ocean. So am I. 🌊</p>
+<div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;">
+  <button class="btn-yes" onclick="goYes()">Okay — YES! I choose you too 💍</button>
+  <button class="btn-no" style="position:relative;" onclick="back1()">Let me re-read the question…</button>
+</div>
+</div>
+
+<!-- ===== S3: YES CELEBRATION ===== -->
+<div class="screen" id="s3">
+
+<!-- Our real photo (matches your faces) -->
+<div class="hero-photos" aria-label="Celebration photo">
+  <img class="wide" src="assets/memories/memory_3.jpg" alt="Sasi and Anesha memory" loading="eager">
+</div>
+
+<!-- (Old avatar art kept but hidden) -->
+<svg class="avatar-svg" width="340" height="220" viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="sg2" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#c47040"/>
+      <stop offset="60%" stop-color="#8B4513"/>
+      <stop offset="100%" stop-color="#6B3410"/>
+    </radialGradient>
+    <radialGradient id="ag2" cx="45%" cy="38%" r="55%">
+      <stop offset="0%" stop-color="#f5d0b3"/>
+      <stop offset="58%" stop-color="#e7b08f"/>
+      <stop offset="100%" stop-color="#cc8d68"/>
+    </radialGradient>
+    <radialGradient id="shg2" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#2a1208"/>
+      <stop offset="100%" stop-color="#0a0404"/>
+    </radialGradient>
+    <linearGradient id="ahg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#201008"/>
+      <stop offset="45%" stop-color="#0d0606"/>
+      <stop offset="100%" stop-color="#060303"/>
+    </linearGradient>
+    <!-- Celebration glow -->
+    <radialGradient id="cg1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffd700" stop-opacity=".3"/>
+      <stop offset="100%" stop-color="#ffd700" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cg2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e879f9" stop-opacity=".25"/>
+      <stop offset="100%" stop-color="#e879f9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- celebration glow rings -->
+  <ellipse cx="95" cy="165" rx="85" ry="50" fill="url(#cg1)"/>
+  <ellipse cx="245" cy="165" rx="85" ry="50" fill="url(#cg2)"/>
+
+  <!-- === SASI HAPPY === -->
+  <rect x="42" y="158" width="80" height="56" rx="16" fill="#f0f0f0" stroke="#dde8f8" stroke-width="1"/>
+  <rect x="42" y="158" width="25" height="4" rx="2" fill="#cc1111" opacity=".6" transform="translate(15,10)"/>
+  <path d="M80 147 Q95 150 110 147 L110 160 Q95 165 80 160Z" fill="url(#sg2)"/>
+  <ellipse cx="95" cy="118" rx="40" ry="41" fill="url(#sg2)"/>
+  <path d="M55 116 Q56 72 95 68 Q134 72 135 116 Q128 90 95 87 Q62 90 55 116Z" fill="url(#shg2)"/>
+  <path d="M56 114 Q58 76 95 73 Q132 76 134 114" fill="url(#shg2)"/>
+  <path d="M62 102 Q70 84 85 80" stroke="#1a0808" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".6"/>
+  <path d="M128 102 Q120 84 105 80" stroke="#1a0808" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".6"/>
+  <ellipse cx="55" cy="119" rx="7" ry="9" fill="url(#sg2)"/>
+  <ellipse cx="135" cy="119" rx="7" ry="9" fill="url(#sg2)"/>
+  <!-- beard happy version -->
+  <path d="M73 133 Q84 128 95 130 Q106 128 117 133 Q110 140 95 139 Q80 140 73 133Z" fill="#0d0606"/>
+  <path d="M59 128 Q56 142 60 156 Q69 168 95 170 Q121 168 130 156 Q134 142 131 128 Q122 138 95 140 Q68 138 59 128Z" fill="#110808"/>
+  <!-- happy squinty eyes - crescent -->
+  <path d="M70 110 Q80 102 90 110" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M100 110 Q110 102 120 110" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <!-- VIBRANT gold shine in happy eyes -->
+  <ellipse cx="80" cy="109" rx="6" ry="3" fill="rgba(255,220,80,.25)"/>
+  <ellipse cx="110" cy="109" rx="6" ry="3" fill="rgba(255,220,80,.25)"/>
+  <!-- eyebrows raised in joy -->
+  <path d="M68 100 Q80 92 91 96" stroke="#0d0606" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M99 96 Q110 92 122 100" stroke="#0d0606" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <!-- BIG BEAMING SMILE -->
+  <path d="M73 136 Q95 152 117 136" stroke="#5a2a0a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- teeth hint -->
+  <path d="M79 138 Q95 148 111 138" fill="rgba(255,255,255,.35)"/>
+  <!-- VIBRANT celebration cheeks -->
+  <ellipse cx="62" cy="124" rx="13" ry="8" fill="#ff6b9d" opacity=".35"/>
+  <ellipse cx="128" cy="124" rx="13" ry="8" fill="#ff6b9d" opacity=".35"/>
+  <!-- FIST PUMP arm -->
+  <path d="M52 170 Q30 148 34 122" stroke="#8B4513" stroke-width="13" stroke-linecap="round" fill="none"/>
+  <ellipse cx="34" cy="119" rx="11" ry="10" fill="#8B4513"/>
+  <!-- arm around Anesha -->
+  <path d="M134 178 Q170 162 192 170" stroke="#8B4513" stroke-width="14" stroke-linecap="round" fill="none"/>
+
+  <!-- === ANESHA HAPPY === -->
+  <rect x="218" y="158" width="80" height="56" rx="16" fill="#9333ea" stroke="#a855f7" stroke-width="1.5"/>
+  <path d="M230 162 Q258 172 286 162" stroke="#fbbf24" stroke-width="2.2" fill="none"/>
+  <circle cx="258" cy="175" r="3.5" fill="#fbbf24"/>
+  <path d="M242 146 Q258 150 274 146 L274 162 Q258 167 242 162Z" fill="url(#ag2)"/>
+  <ellipse cx="258" cy="116" rx="36" ry="39" fill="url(#ag2)"/>
+  <path d="M222 110 Q224 68 258 64 Q292 68 294 110 Q290 82 258 79 Q226 82 222 110Z" fill="url(#ahg2)"/>
+  <path d="M222 110 Q222 74 258 70 Q294 74 294 110" fill="url(#ahg2)"/>
+  <path d="M222 110 Q218 135 216 160 Q214 185 215 215" stroke="#0d0412" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <path d="M294 110 Q296 132 295 158 Q293 180 290 215" stroke="#0d0412" stroke-width="15" stroke-linecap="round" fill="none" opacity=".75"/>
+  <path d="M218 122 Q224 134 218 146 Q224 158 218 170" stroke="#1a0828" stroke-width="5" fill="none" stroke-linecap="round" opacity=".65"/>
+  <ellipse cx="222" cy="118" rx="7" ry="9" fill="url(#ag2)"/>
+  <ellipse cx="294" cy="118" rx="7" ry="9" fill="url(#ag2)"/>
+  <circle cx="221" cy="118" r="5" fill="#fbbf24" stroke="#fde68a" stroke-width="1"/>
+  <circle cx="221" cy="118" r="2.5" fill="#fef3c7"/>
+  <circle cx="295" cy="118" r="5" fill="#fbbf24" stroke="#fde68a" stroke-width="1"/>
+  <circle cx="295" cy="118" r="2.5" fill="#fef3c7"/>
+  <!-- happy squinty eyes Anesha -->
+  <path d="M234 106 Q244 98 254 106" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M262 106 Q272 98 282 106" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <!-- VIBRANT eye shines -->
+  <ellipse cx="244" cy="105" rx="6" ry="3" fill="rgba(232,121,249,.3)"/>
+  <ellipse cx="272" cy="105" rx="6" ry="3" fill="rgba(232,121,249,.3)"/>
+  <!-- lashes visible even happy -->
+  <path d="M234 104 Q238 99 244 102 Q250 99 254 104" stroke="#0d0412" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M262 104 Q266 99 272 102 Q278 99 282 104" stroke="#0d0412" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- eyebrows raised -->
+  <path d="M234 96 Q244 88 254 92" stroke="#0d0412" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+  <path d="M262 92 Q272 88 282 96" stroke="#0d0412" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+  <!-- bindi glowing -->
+  <circle cx="258" cy="95" r="6" fill="#e879f9" opacity=".9"/>
+  <circle cx="258" cy="95" r="4" fill="#ec4899"/>
+  <circle cx="258" cy="95" r="2" fill="#fce7f3"/>
+  <circle cx="258" cy="95" r="9" fill="rgba(232,121,249,.2)"/>
+  <!-- big smile Anesha -->
+  <path d="M240 130 Q258 146 276 130" stroke="#7a3010" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M246 132 Q258 142 270 132" fill="rgba(255,255,255,.3)"/>
+  <!-- VIBRANT cheeks -->
+  <ellipse cx="228" cy="120" rx="13" ry="8" fill="#f9a8d4" opacity=".4"/>
+  <ellipse cx="288" cy="120" rx="13" ry="8" fill="#f9a8d4" opacity=".4"/>
+  <!-- arm around Sasi -->
+  <path d="M222 178 Q188 162 166 170" stroke="#c0845a" stroke-width="12" stroke-linecap="round" fill="none"/>
+
+  <!-- MASSIVE celebration hearts & stars -->
+  <text x="170" y="30" font-size="32" fill="#ff2d78" text-anchor="middle" opacity=".97">♥</text>
+  <text x="148" y="14" font-size="20" fill="#ffd700">♥</text>
+  <text x="192" y="12" font-size="18" fill="#e879f9">♥</text>
+  <text x="132" y="28" font-size="14" fill="#38bdf8">♥</text>
+  <text x="208" y="26" font-size="14" fill="#4ade80">♥</text>
+  <text x="158" y="6" font-size="11" fill="#fb923c">♥</text>
+  <text x="182" y="4" font-size="10" fill="#a78bfa">♥</text>
+  <!-- ring above -->
+  <text x="155" y="52" font-size="30" text-anchor="middle">💍</text>
+  <!-- sparkles -->
+  <text x="42" y="62" font-size="16" fill="#ffd700" opacity=".7">★</text>
+  <text x="130" y="56" font-size="12" fill="#e879f9" opacity=".7">✦</text>
+  <text x="206" y="54" font-size="12" fill="#ffd700" opacity=".7">✦</text>
+  <text x="290" y="60" font-size="16" fill="#4ade80" opacity=".65">★</text>
+  <text x="310" y="38" font-size="10" fill="#fb923c" opacity=".6">✦</text>
+</svg>
+
+<div class="shimmer">Anesha Said YES! 🎉</div>
+<div class="divider"></div>
+<div class="sasi-b">Sasi is the happiest man alive 🥹✨</div>
+<div class="love-box" style="margin-top:4px;">
+  <p class="love-msg">You will receive a surprise soon.<br/>It takes time — and every wait makes it better, stronger.<br/>You will receive mail soon… and after that, a happy life we will enjoy together. 💛</p>
+</div>
+<div class="love-box" style="margin-top:10px;">
+  <p class="love-msg">You selected the right person.<br/>A special surprise proposal event is on the way.<br/>You will be notified by mail when it’s ready — by the Main System of Love. 💌</p>
+</div>
+<div class="love-box">
+  <p class="love-msg">"From this breath, every adventure has your name in it.<br/>Every morning more beautiful. Every ordinary Tuesday — extraordinary.<br/>I chose you before I knew how to say it,<br/>and I will keep choosing you, every single day, forever."</p>
+  <p style="font-size:.72rem;color:rgba(255,215,100,.35);margin-top:13px;letter-spacing:2px;text-transform:uppercase;">— Sasi · Sri Lanka · This very night</p>
+</div>
+<div class="tags">
+  <span class="tag">🌊 Sri Lanka, where it began</span>
+  <span class="tag">💍 She said Yes</span>
+  <span class="tag">✨ Forever starts now</span>
+  <span class="tag">🌴 Our story</span>
+  <span class="tag">🥂 Celebrate!</span>
+</div>
+<div class="memories">
+  <h2 style="margin-top:6px;">Memories, floating like forever</h2>
+  <p class="sub">Our memories are already here — floating like a carousel. Hover to pause.</p>
+  <div class="carousel-stage" aria-label="Memories carousel">
+    <div id="carousel" class="carousel"></div>
+  </div>
+  <div class="memory-caption">Every moment is a promise. Every promise is forever.</div>
+</div>
+<p class="gi" style="margin-top:8px;">System status: preparing your special surprise… you’ll be notified when it’s ready. 💌</p>
+<p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;color:#ffd700;margin-top:4px;">You chose right, Anesha. And so did I. 💛</p>
+<p style="font-size:.7rem;color:rgba(255,255,255,.16);font-style:italic;">Under the stars of Sri Lanka — forever begins.</p>
+</div>
+
+</div>
+<script>
+document.body.classList.add('bright');
+const wc=document.getElementById('world'),wx=wc.getContext('2d');
+let W,H;function rsz(){W=wc.width=window.innerWidth;H=wc.height=window.innerHeight;}
+rsz();window.addEventListener('resize',rsz);
+const T=()=>Date.now()/1000;
+const stars=Array.from({length:200},()=>({x:Math.random(),y:Math.random()*.54,r:Math.random()*1.7+.3,a:Math.random(),da:(Math.random()-.5)*.022,ph:Math.random()*Math.PI*2}));
+const ff=Array.from({length:28},()=>({x:Math.random(),y:.55+Math.random()*.3,vx:(Math.random()-.5)*.0007,vy:(Math.random()-.5)*.0005,a:Math.random(),da:.014+Math.random()*.022,r:1.5+Math.random()*2}));
+const ln=Array.from({length:5},()=>({x:Math.random(),y:.72+Math.random()*.06,vx:.00012+Math.random()*.00008,ph:Math.random()*Math.PI*2}));
+const pt=Array.from({length:24},()=>({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.0007,vy:.0004+Math.random()*.0003,rot:Math.random()*360,vr:(Math.random()-.5)*1.5,a:.3+Math.random()*.45,s:3+Math.random()*4,h:290+Math.random()*80}));
+function dw(){
+  const t=T();wx.clearRect(0,0,W,H);
+  const sky=wx.createLinearGradient(0,0,0,H*.62);
+  sky.addColorStop(0,'#01000b');sky.addColorStop(.4,'#08031e');sky.addColorStop(.7,'#0f0932');sky.addColorStop(1,'#1a0e3c');
+  wx.fillStyle=sky;wx.fillRect(0,0,W,H*.65);
+  const mw=wx.createLinearGradient(0,0,W*.8,H*.4);
+  mw.addColorStop(0,'rgba(150,130,220,.0)');mw.addColorStop(.45,'rgba(180,160,255,.032)');mw.addColorStop(.55,'rgba(200,180,255,.022)');mw.addColorStop(1,'rgba(150,130,220,.0)');
+  wx.fillStyle=mw;wx.fillRect(0,0,W,H*.5);
+  stars.forEach(s=>{s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;const f=.5+.5*Math.sin(t*.9+s.ph);wx.beginPath();wx.arc(s.x*W,s.y*H,s.r*(1+f*.3),0,Math.PI*2);wx.fillStyle=`rgba(255,245,215,${s.a*f})`;wx.fill();});
+  const mx=W*.84,my=H*.1;
+  [80,56,36].forEach((r,i)=>{wx.beginPath();wx.arc(mx,my,r,0,Math.PI*2);wx.fillStyle=`rgba(255,230,150,${[.022,.038,.065][i]})`;wx.fill();});
+  wx.beginPath();wx.arc(mx,my,24,0,Math.PI*2);
+  const mg=wx.createRadialGradient(mx-5,my-5,2,mx,my,24);mg.addColorStop(0,'#fffae0');mg.addColorStop(1,'rgba(255,220,130,.78)');wx.fillStyle=mg;wx.fill();
+  const oy=H*.57;
+  const oc=wx.createLinearGradient(0,oy,0,H*.84);oc.addColorStop(0,'#071830');oc.addColorStop(.45,'#050f22');oc.addColorStop(1,'#030a18');wx.fillStyle=oc;wx.fillRect(0,oy,W,H*.84-oy);
+  for(let i=0;i<12;i++){const ry=oy+i*14+Math.sin(t*.9+i*.4)*2.5,rw=(13-i)*Math.max(.4,1-i*.05);wx.beginPath();wx.ellipse(mx,ry,rw,2,0,0,Math.PI*2);wx.fillStyle=`rgba(255,230,140,${(.17-i*.012)*Math.max(0,1-i*.06)})`;wx.fill();}
+  for(let w=0;w<5;w++){wx.beginPath();const wy=oy+w*11;wx.moveTo(0,wy);for(let x=0;x<=W;x+=28){wx.quadraticCurveTo(x+14,wy+Math.sin(t*.75+x*.013+w*.9)*4,x+28,wy);}wx.strokeStyle=`rgba(120,180,255,${.05-w*.008})`;wx.lineWidth=1+w*.18;wx.stroke();}
+  wx.beginPath();wx.moveTo(0,oy);for(let x=0;x<=W;x+=18){wx.quadraticCurveTo(x+9,oy+Math.sin(t*.8+x*.015)*5,x+18,oy);}wx.strokeStyle=`rgba(100,210,255,${.1+.05*Math.sin(t*.6)})`;wx.lineWidth=1.5;wx.stroke();
+  ln.forEach(l=>{l.x=(l.x+l.vx)%1;const lx=l.x*W,ly=l.y*H+Math.sin(t*.5+l.ph)*4;wx.beginPath();wx.arc(lx,ly,15,0,Math.PI*2);wx.fillStyle='rgba(255,195,70,.05)';wx.fill();wx.beginPath();wx.ellipse(lx,ly,7,9.5,0,0,Math.PI*2);wx.fillStyle=`rgba(255,${135+Math.sin(t+l.ph)*28},55,.5)`;wx.fill();wx.beginPath();wx.arc(lx,ly,2.5,0,Math.PI*2);wx.fillStyle=`rgba(255,245,150,${.55+.3*Math.sin(t*3+l.ph)})`;wx.fill();});
+  const bey=H*.79;const bc=wx.createLinearGradient(0,bey,0,H);bc.addColorStop(0,'#2a1c0c');bc.addColorStop(.5,'#1e1208');bc.addColorStop(1,'#110b04');wx.fillStyle=bc;wx.fillRect(0,bey,W,H-bey);
+  wx.beginPath();wx.ellipse(W*.5,bey+4,W*.44,6,0,0,Math.PI*2);wx.fillStyle=`rgba(255,200,100,${.04+.02*Math.sin(t*.4)})`;wx.fill();
+  palm(W*.04,bey,-1,t);palm(W*.96,bey-6,1,t);palm(W*.13,bey+5,-1.2,t,.72);palm(W*.87,bey+3,1.1,t,.76);
+  ff.forEach(f=>{f.x+=f.vx;f.y+=f.vy;f.a+=f.da;if(f.a>1||f.a<0)f.da*=-1;if(f.x<0||f.x>1)f.vx*=-1;if(f.y<.5||f.y>.87)f.vy*=-1;const fx=f.x*W,fy=f.y*H;wx.beginPath();wx.arc(fx,fy,f.r+2.5,0,Math.PI*2);wx.fillStyle=`rgba(255,220,80,${f.a*.1})`;wx.fill();wx.beginPath();wx.arc(fx,fy,f.r,0,Math.PI*2);wx.fillStyle=`rgba(255,230,120,${f.a*.7})`;wx.fill();});
+  pt.forEach(p=>{p.x+=p.vx+Math.sin(t*.4+p.vx*10)*.0003;p.y+=p.vy;p.rot+=p.vr;if(p.y>1){p.y=-.02;p.x=Math.random();}wx.save();wx.translate(p.x*W,p.y*H);wx.rotate(p.rot*Math.PI/180);wx.beginPath();wx.ellipse(0,0,p.s,p.s*1.7,0,0,Math.PI*2);wx.fillStyle=`hsla(${p.h},85%,72%,${p.a})`;wx.fill();wx.restore();});
+  requestAnimationFrame(dw);
+}
+function palm(x,gy,dir,t,sc=1){const h=-118*sc,sw=Math.sin(t*.65+dir)*.04;wx.save();wx.translate(x,gy);wx.beginPath();wx.moveTo(0,0);wx.bezierCurveTo(dir*14*sc,h*.3+10,dir*24*sc+sw*70,h*.7,dir*28*sc+sw*110,h);wx.strokeStyle='rgba(45,25,6,.9)';wx.lineWidth=9*sc;wx.stroke();[[1,-.5],[.4,-1],[-.2,-1.1],[-1,-.4],[1.3,-.2],[-1.3,-.1]].forEach(([fx,fy])=>{const sw2=Math.sin(t*.7+fx)*8*sc;wx.beginPath();wx.moveTo(dir*28*sc+sw*110,h);wx.bezierCurveTo(dir*28*sc+fx*48*sc+sw2,h+fy*38*sc,dir*28*sc+fx*88*sc+sw2*1.5,h+fy*20*sc,dir*28*sc+fx*112*sc+sw2*2,h+fy*5*sc);wx.strokeStyle=`rgba(18,62,12,${.72+fy*.1})`;wx.lineWidth=3.5*sc;wx.stroke();});wx.restore();}
+dw();
+const quotes=[
+  {t:`"If you say no, the stars will still be beautiful — but they won't mean anything without you standing next to me to point them out."`,a:"— Sasi, still looking up at the sky"},
+  {t:`"I have rehearsed this moment a thousand times. In every single version, you smiled and said yes. Don't make the universe wrong about you."`,a:"— Sasi, with his whole heart"},
+  {t:`"I don't need the whole ocean. I just need the person who makes an ordinary evening feel like a miracle. You've been that person longer than you know."`,a:"— Sasi, on this Sri Lankan shore"},
+  {t:`"Every love story needs a place where it changes forever. This is ours — the sand, the stars, this sea, and a question that has lived in my chest so long it has its own heartbeat."`,a:"— Sasi, Sri Lanka"},
+  {t:`"You make me want to be worthy of your ordinary Tuesdays — not just the adventures, but the quiet mornings, the tired nights, the whole beautiful mess of it."`,a:"— Sasi, entirely serious"},
+  {t:`"I promise you a lifetime of getting lost together, laughing at nothing, and loving you so fully you'll forget there was ever a version of you that did any of this alone."`,a:"— Sasi, all in"},
+  {t:`"The moon has watched a million proposals on this earth. Tonight it leaned in close. That means something. Say yes — and we'll tell this story forever."`,a:"— Sasi & the moon, in agreement"}
+];
+const titles=["Wait… let me show you what you'd be leaving behind 🥹","Anesha… the ocean literally paused for this 🌊","Even the fireflies stopped to stare 🌟","The palm trees are shaking their heads 🌴","You're making this even more romantic 😂","Quote six of infinite — I'm patient like the sea 💫","The moon said: Anesha, please. Just yes. 🌙"];
+let nc=0;
+function clickNo(){
+  nc++;
+  const btn=document.getElementById('btnNo');
+  const msg=document.getElementById('noMsg');
+  const dodgeLines=[
+    "The ocean just got stuck like: “Wait… not yet.” 🌊",
+    "Even the moon blinked twice and said: “Try again.” 🌙",
+    "The fireflies are protesting this decision 🌟",
+    "Palm trees whispering: “No is not an option.” 🌴",
+    "The ring is hiding until you say Yes 💍"
+  ];
+  if(nc<=5){
+    if(btn){
+      btn.style.position='fixed';
+      btn.style.zIndex='9999';
+      const pad=12;
+      const bw=Math.max(140,btn.offsetWidth||140);
+      const bh=Math.max(44,btn.offsetHeight||44);
+      const nx=pad+Math.random()*(window.innerWidth-bw-pad*2);
+      const ny=pad+Math.random()*(window.innerHeight-bh-pad*2);
+      btn.style.left=nx+'px';
+      btn.style.top=ny+'px';
+    }
+    if(msg) msg.textContent=dodgeLines[nc-1]||"No is running away 😅";
+    return;
+  }
+  if(btn){
+    btn.style.position='relative';
+    btn.style.left='';
+    btn.style.top='';
+  }
+  if(msg) msg.textContent='';
+  const idx=Math.max(0,nc-6),q=quotes[idx%quotes.length];
+  document.getElementById('qtext').textContent=q.t;
+  document.getElementById('qauthor').textContent=q.a;
+  document.getElementById('s2h').textContent="Wait… let me show you what you're gonna miss 🥹";
+  document.getElementById('s1').classList.remove('active');
+  document.getElementById('s2').classList.add('active');
+}
+function back1(){
+  document.getElementById('s2').classList.remove('active');
+  document.getElementById('s1').classList.add('active');
+  const msg=document.getElementById('noMsg');
+  if(msg)msg.textContent='';
+  const btn=document.getElementById('btnNo');
+  if(btn){
+    btn.style.position='relative';
+    btn.style.left='';
+    btn.style.top='';
+  }
+  nc=0;
+}
+const cc=document.getElementById('confC'),cx=cc.getContext('2d');
+let cp=[],cr=false;
+function rsz2(){cc.width=window.innerWidth;cc.height=window.innerHeight;}rsz2();window.addEventListener('resize',rsz2);
+const COLS=['#e91e8c','#f4a261','#ffd700','#ff8fab','#c3b1e1','#a8e6cf','#fff','#ff5e8a','#ffe066','#b5ead7','#a78bfa','#67e8f9','#4ade80'];
+function mkp(){return{x:Math.random()*window.innerWidth,y:-12,vx:(Math.random()-.5)*7,vy:2+Math.random()*5,r:4+Math.random()*9,rot:Math.random()*360,vr:(Math.random()-.5)*12,col:COLS[Math.floor(Math.random()*COLS.length)],shape:Math.random()>.35?'rect':'circle',life:1,ld:.0022+Math.random()*.002};}
+function confLoop(){
+  if(!cr)return;cx.clearRect(0,0,cc.width,cc.height);
+  if(cp.length<320)for(let i=0;i<8;i++)cp.push(mkp());
+  cp=cp.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.vy+=.09;p.life-=p.ld;cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot*Math.PI/180);cx.globalAlpha=Math.max(0,p.life);cx.fillStyle=p.col;if(p.shape==='circle'){cx.beginPath();cx.arc(0,0,p.r,0,Math.PI*2);cx.fill();}else cx.fillRect(-p.r/2,-p.r*.75,p.r,p.r*1.5);cx.restore();return p.y<cc.height+20&&p.life>0;});
+  requestAnimationFrame(confLoop);
+}
+let memoryUrls=[];
+let memoriesReady=false;
+function initMemories(){
+  if(memoriesReady) return;
+  memoriesReady=true;
+  memoryUrls=[
+    'assets/memories/memory_1.jpg',
+    'assets/memories/memory_2.jpg',
+    'assets/memories/memory_3.jpg',
+    'assets/memories/memory_4.jpg',
+    'assets/memories/memory_5.jpg',
+    'assets/memories/memory_6.jpg',
+    'assets/memories/memory_7.jpg',
+    'assets/memories/memory_8.jpg'
+  ];
+  renderCarousel();
+}
+function renderCarousel(){
+  const c=document.getElementById('carousel');
+  if(!c) return;
+  c.innerHTML='';
+  const n=memoryUrls.length;
+  const radius=Math.min(320,Math.max(220,140+n*14));
+  memoryUrls.forEach((url,idx)=>{
+    const card=document.createElement('div');
+    card.className='memory';
+    const ang=(360/n)*idx;
+    card.style.transform=`translate(-50%,-50%) rotateY(${ang}deg) translateZ(${radius}px)`;
+    const img=document.createElement('img');
+    img.loading='eager';
+    img.alt='';
+    img.src=url;
+    img.onerror=()=>{card.remove();};
+    card.appendChild(img);
+    c.appendChild(card);
+  });
+}
+function goYes(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s3').classList.add('active');
+  initMemories();
+  cr=true;confLoop();
+  setTimeout(()=>{cr=false;setTimeout(()=>cx.clearRect(0,0,cc.width,cc.height),800);},14000);
+}
+</script>
+</body>
+</html>
